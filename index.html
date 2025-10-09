@@ -1,1 +1,136 @@
-<h1>Hello world</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Integration</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="page-header text-center mb-4">
+                    <h1 class="page-title">
+                        <span class="icon">🔗</span>
+                        Partner Integration
+                    </h1>
+                </div>
+
+                <form id="urlForm">
+                    <!-- Partner Name Dropdown -->
+                    <div class="mb-4">
+                        <label for="partnerName" class="form-label">
+                            <span class="icon">👥</span>
+                            Partner Name
+                        </label>
+                        <select class="form-select" id="partnerName" aria-label="Partner Name">
+                            <option value="" selected>-- Select Partner --</option>
+                            <option value="Stenopool">Stenopool</option>
+                            <option value="My Diabby">My Diabby</option>
+                            <option value="Test partner">Test partner</option>
+                        </select>
+                    </div>
+
+                    <!-- Environment Dropdown -->
+                    <div class="mb-4">
+                        <label for="environment" class="form-label">
+                            <span class="icon">🌐</span>
+                            Environment
+                        </label>
+                        <select class="form-select" id="environment" aria-label="Environment">
+                            <option value="" selected>-- Select Environment --</option>
+                            <option value="devprog">Dev Prog</option>
+                            <option value="qa">QA</option>
+                            <option value="preprod">Pre Prod</option>
+                        </select>
+                    </div>
+
+                    <!-- Generated URL Text Area -->
+                    <div class="mb-4">
+                        <label for="generatedUrl" class="form-label">
+                            <span class="icon">📝</span>
+                            Generated URL
+                        </label>
+                        <textarea 
+                            class="form-control" 
+                            id="generatedUrl" 
+                            rows="3" 
+                            readonly 
+                            placeholder="Select both Partner Name and Environment to generate URL..."
+                        ></textarea>
+                    </div>
+
+                    <!-- Navigate Button -->
+                    <div class="d-grid">
+                        <button 
+                            type="button" 
+                            class="btn btn-primary btn-lg" 
+                            id="navigateBtn" 
+                            disabled
+                        >
+                            🔗 Link to Omnipod® 5
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Get DOM elements
+        const partnerNameSelect = document.getElementById('partnerName');
+        const environmentSelect = document.getElementById('environment');
+        const generatedUrlTextarea = document.getElementById('generatedUrl');
+        const navigateBtn = document.getElementById('navigateBtn');
+
+        // Function to convert environment name to URL format
+        function getEnvironmentSlug(environment) {
+            // Convert to lowercase and remove spaces
+            return environment.toLowerCase().replace(/\s+/g, '');
+        }
+
+        // Function to update URL and button state
+        function updateUrl() {
+            const partnerName = partnerNameSelect.value;
+            const environment = environmentSelect.value;
+
+            // Check if both values are selected
+            if (partnerName && environment) {
+                // Construct the URL dynamically
+                const envSlug = getEnvironmentSlug(environment);
+                const fullUrl = `https://myaccount-intl${envSlug}.omnipod.com/s/edsp?partner=${encodeURIComponent(partnerName)}`;
+                
+                // Update textarea
+                generatedUrlTextarea.value = fullUrl;
+                
+                // Enable button
+                navigateBtn.disabled = false;
+            } else {
+                // Clear textarea and disable button if either dropdown is empty
+                generatedUrlTextarea.value = '';
+                navigateBtn.disabled = true;
+            }
+        }
+
+        // Function to navigate to the URL
+        function navigateToUrl() {
+            const url = generatedUrlTextarea.value;
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+
+        // Add event listeners
+        partnerNameSelect.addEventListener('change', updateUrl);
+        environmentSelect.addEventListener('change', updateUrl);
+        navigateBtn.addEventListener('click', navigateToUrl);
+    </script>
+</body>
+</html>
