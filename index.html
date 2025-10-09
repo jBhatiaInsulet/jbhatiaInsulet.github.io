@@ -106,7 +106,6 @@
                 // Construct the URL dynamically
                 const envSlug = getEnvironmentSlug(environment);
                 
-                // Build the RelayState value (needs to be encoded within the returnURL)
                 const relayStateValue = encodeURIComponent(`/s/edsp?partner=${partnerName}`);
                 
                 // Build the return URL with encoded RelayState
