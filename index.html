@@ -30,7 +30,7 @@
                         <select class="form-select" id="partnerName" aria-label="Partner Name">
                             <option value="" selected>-- Select Partner --</option>
                             <option value="Stenopool">Stenopool</option>
-                            <option value="My Diabby">My Diabby</option>
+                            <option value="MyDiabby">MyDiabby</option>
                             <option value="Test partner">Test partner</option>
                         </select>
                     </div>
@@ -43,7 +43,7 @@
                         </label>
                         <select class="form-select" id="environment" aria-label="Environment">
                             <option value="" selected>-- Select Environment --</option>
-                            <option value="devprog">Dev Prog</option>
+                            <option value="dev">Dev Prog</option>
                             <option value="qa">QA</option>
                             <option value="preprod">Pre Prod</option>
                         </select>
@@ -58,7 +58,7 @@
                         <textarea 
                             class="form-control" 
                             id="generatedUrl" 
-                            rows="3" 
+                            rows="5" 
                             readonly 
                             placeholder="Select both Partner Name and Environment to generate URL..."
                         ></textarea>
@@ -105,7 +105,15 @@
             if (partnerName && environment) {
                 // Construct the URL dynamically
                 const envSlug = getEnvironmentSlug(environment);
-                const fullUrl = `https://myaccount-intl${envSlug}.omnipod.com/s/edsp?partner=${encodeURIComponent(partnerName)}`;
+                
+                // Build the RelayState value (needs to be encoded within the returnURL)
+                const relayStateValue = encodeURIComponent(`/s/edsp?partner=${partnerName}`);
+                
+                // Build the return URL with encoded RelayState
+                const returnUrl = `https://oktadev-eu.omnipod.com/app/salesforce/exk1pblh38RCagT5M0x7/sso/saml?RelayState=${relayStateValue}`;
+                
+                // Build the full URL with proper encoding
+                const fullUrl = `https://account-intl${envSlug}.omnipod.com/?app=self&returnURL=${encodeURIComponent(returnUrl)}`;
                 
                 // Update textarea
                 generatedUrlTextarea.value = fullUrl;
