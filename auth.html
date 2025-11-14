@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Response</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="page-header text-center mb-4">
+                    <h1 class="page-title">
+                        <span class="icon">🔐</span>
+                        Authentication Response
+                    </h1>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <span class="icon">📋</span>
+                            Query Parameters
+                        </h5>
+                        
+                        <!-- State Parameter -->
+                        <div class="mb-3 param-group">
+                            <label class="form-label">
+                                <span class="icon">🏷️</span>
+                                State
+                            </label>
+                            <div class="param-value" id="stateValue">
+                                <span class="text-muted">No value provided</span>
+                            </div>
+                        </div>
+
+                        <!-- Auth Code Parameter -->
+                        <div class="mb-3 param-group">
+                            <label class="form-label">
+                                <span class="icon">🔑</span>
+                                Authorization Code
+                            </label>
+                            <div class="param-value" id="authCodeValue">
+                                <span class="text-muted">No value provided</span>
+                            </div>
+                        </div>
+
+                        <!-- Client ID Parameter -->
+                        <div class="mb-3 param-group">
+                            <label class="form-label">
+                                <span class="icon">🆔</span>
+                                Client ID
+                            </label>
+                            <div class="param-value" id="clientIdValue">
+                                <span class="text-muted">No value provided</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Back Button -->
+                <div class="d-grid">
+                    <a href="index.html" class="btn btn-primary btn-lg">
+                        ← Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Function to get query parameters from the URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                state: params.get('state'),
+                auth_code: params.get('auth_code'),
+                client_id: params.get('client_id')
+            };
+        }
+
+        // Function to display parameter value
+        function displayParam(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (value) {
+                element.innerHTML = `<code class="param-code">${escapeHtml(value)}</code>`;
+            } else {
+                element.innerHTML = '<span class="text-muted">No value provided</span>';
+            }
+        }
+
+        // Function to escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // On page load, get and display the parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = getQueryParams();
+            
+            displayParam('stateValue', params.state);
+            displayParam('authCodeValue', params.auth_code);
+            displayParam('clientIdValue', params.client_id);
+        });
+    </script>
+
+    <style>
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .card-title {
+            color: #16325c;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e5e5;
+            padding-bottom: 10px;
+        }
+
+        .param-group {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #16325c;
+        }
+
+        .param-group .form-label {
+            margin-bottom: 8px;
+        }
+
+        .param-value {
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            word-break: break-all;
+        }
+
+        .param-code {
+            color: #16325c;
+            background: transparent;
+            padding: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</body>
+</html>
+
