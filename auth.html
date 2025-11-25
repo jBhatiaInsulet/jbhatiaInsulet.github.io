@@ -49,25 +49,9 @@
                             </div>
                         </div>
 
-                        <!-- Client ID Parameter -->
-                        <div class="mb-3 param-group">
-                            <label class="form-label">
-                                <span class="icon">🆔</span>
-                                Client ID
-                            </label>
-                            <div class="param-value" id="clientIdValue">
-                                <span class="text-muted">No value provided</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Back Button -->
-                <div class="d-grid">
-                    <a href="index.html" class="btn btn-primary btn-lg">
-                        ← Back to Home
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -81,8 +65,7 @@
             const params = new URLSearchParams(window.location.search);
             return {
                 state: params.get('state'),
-                auth_code: params.get('auth_code'),
-                client_id: params.get('client_id')
+                code: params.get('code')
             };
         }
 
@@ -108,8 +91,7 @@
             const params = getQueryParams();
             
             displayParam('stateValue', params.state);
-            displayParam('authCodeValue', params.auth_code);
-            displayParam('clientIdValue', params.client_id);
+            displayParam('authCodeValue', params.code);
         });
     </script>
 
