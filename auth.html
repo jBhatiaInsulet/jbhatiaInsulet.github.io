@@ -118,6 +118,7 @@
 
         // Function to make Product Cloud API request
         async function makeProductCloudRequest() {
+            const serverId = 'ausbpdi48dDNhmB3T0x7';
             const clientId = '0oabpdi4tiT8wvJco0x7';
             const clientSecret = '_DaNIKT5rNc4iIdXH0MNxBPGx3WGJJCzIxAAkjMLwJd4OU16XCDRExMRx8v_KN8N';
             const redirectUri = 'https://jbhatiainsulet.github.io';
@@ -138,14 +139,14 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
 
             try {
-                // Product Cloud API endpoint
-                const apiUrl = 'https://eu-int.partner.omnipodapi.com/v1/clients/token';
+                // Product Cloud API endpoint - OAuth 2.0 Auth Code to Token Exchange
+                const apiUrl = `https://eu-int.partner.omnipodapi.com/v1/${serverId}/token`;
                 
                 const requestBody = {
+                    redirectUri: redirectUri,
                     clientId: clientId,
-                    clientSecret: clientSecret,
                     code: authCode,
-                    redirectUri: redirectUri
+                    clientSecret: clientSecret
                 };
 
                 console.log('Request Body:', requestBody);
