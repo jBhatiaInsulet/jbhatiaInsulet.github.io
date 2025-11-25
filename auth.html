@@ -52,6 +52,36 @@
                     </div>
                 </div>
 
+                <!-- API Request Card -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <span class="icon">🚀</span>
+                            Product Cloud API Request
+                        </h5>
+                        
+                        <!-- Make Request Button -->
+                        <div class="d-grid">
+                            <button class="btn btn-primary btn-lg" id="makeRequestBtn" onclick="makeProductCloudRequest()">
+                                <span class="icon">📡</span>
+                                Make a Request to Product Cloud
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Response Card -->
+                <div class="card mb-4" id="responseCard" style="display: none;">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <span class="icon">📨</span>
+                            API Response
+                        </h5>
+                        <div class="alert" id="responseAlert" role="alert"></div>
+                        <pre id="responseData" style="max-height: 400px; overflow-y: auto; background: #f8f9fa; padding: 15px; border-radius: 6px; font-size: 12px;"></pre>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -84,6 +114,84 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // Function to make Product Cloud API request
+        async function makeProductCloudRequest() {
+            const clientId = '0oabpdi4tiT8wvJco0x7';
+            const clientSecret = '_DaNIKT5rNc4iIdXH0MNxBPGx3WGJJCzIxAAkjMLwJd4OU16XCDRExMRx8v_KN8N';
+            const redirectUri = 'https://jbhatiainsulet.github.io';
+            
+            const params = getQueryParams();
+            const authCode = params.code;
+
+            // Validate authorization code
+            if (!authCode) {
+                alert('No authorization code found in URL');
+                return;
+            }
+
+            // Show loading state
+            const btn = document.getElementById('makeRequestBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+
+            try {
+                // Product Cloud API endpoint
+                const apiUrl = 'https://eu-dev.partner.omnipodapi.com/v1/clients/token';
+                
+                const requestBody = {
+                    clientId: clientId,
+                    clientSecret: clientSecret,
+                    code: authCode,
+                    redirectUri: redirectUri
+                };
+
+                console.log('Request Body:', requestBody);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+
+                // Display response
+                const responseCard = document.getElementById('responseCard');
+                const responseAlert = document.getElementById('responseAlert');
+                const responseData = document.getElementById('responseData');
+
+                responseCard.style.display = 'block';
+
+                if (response.ok) {
+                    responseAlert.className = 'alert alert-success';
+                    responseAlert.textContent = `✅ Success! Status: ${response.status}`;
+                } else {
+                    responseAlert.className = 'alert alert-danger';
+                    responseAlert.textContent = `❌ Error! Status: ${response.status}`;
+                }
+
+                responseData.textContent = JSON.stringify(data, null, 2);
+
+            } catch (error) {
+                // Display error
+                const responseCard = document.getElementById('responseCard');
+                const responseAlert = document.getElementById('responseAlert');
+                const responseData = document.getElementById('responseData');
+
+                responseCard.style.display = 'block';
+                responseAlert.className = 'alert alert-danger';
+                responseAlert.textContent = '❌ Error making request';
+                responseData.textContent = `Error: ${error.message}\n\nMake sure to update:\n- clientId\n- clientSecret\n- redirectUri\n- apiUrl`;
+            } finally {
+                // Reset button state
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
 
         // On page load, get and display the parameters
