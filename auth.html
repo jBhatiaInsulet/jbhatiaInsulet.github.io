@@ -139,7 +139,7 @@
 
             try {
                 // Product Cloud API endpoint
-                const apiUrl = 'https://eu-prod.partner.omnipodapi.com/v1/clients/token';
+                const apiUrl = 'https://eu-int.partner.omnipodapi.com/v1/clients/token';
                 
                 const requestBody = {
                     clientId: clientId,
@@ -186,7 +186,6 @@
                 responseCard.style.display = 'block';
                 responseAlert.className = 'alert alert-danger';
                 responseAlert.textContent = '❌ Error making request';
-                responseData.textContent = `Error: ${error.message}\n\nMake sure to update:\n- clientId\n- clientSecret\n- redirectUri\n- apiUrl`;
             } finally {
                 // Reset button state
                 btn.disabled = false;
