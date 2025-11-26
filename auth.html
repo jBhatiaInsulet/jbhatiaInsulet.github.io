@@ -121,7 +121,7 @@
             const serverId = 'ausbpdi48dDNhmB3T0x7';
             const clientId = '0oabpdi4tiT8wvJco0x7';
             const clientSecret = '_DaNIKT5rNc4iIdXH0MNxBPGx3WGJJCzIxAAkjMLwJd4OU16XCDRExMRx8v_KN8N';
-            const redirectUri = 'https://jbhatiainsulet.github.io';
+            const redirectUri = 'https://jbhatiainsulet.github.io/auth';
             
             const params = getQueryParams();
             const authCode = params.code;
@@ -138,9 +138,10 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
 
+            // Product Cloud API endpoint - OAuth 2.0 Auth Code to Token Exchange
+            const apiUrl = `https://eu-horizoncloud-int.omnipodapps.com/api/v1/authorization-bridge/clients/${serverId}/token`;
+
             try {
-                // Product Cloud API endpoint - OAuth 2.0 Auth Code to Token Exchange
-                const apiUrl = `https://eu-horizoncloud-int.omnipodapps.com/api/v1/authorization-bridge/clients/${serverId}/token`;
                 
                 const requestBody = {
                     redirectUri: redirectUri,
@@ -150,6 +151,7 @@
                 };
 
                 console.log('Request Body:', requestBody);
+                console.log('API URL:', apiUrl);
                 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
