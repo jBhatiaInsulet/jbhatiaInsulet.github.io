@@ -89,6 +89,9 @@
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Configuration file with secrets (gitignored) -->
+    <script src="config.js"></script>
+    
     <script>
         // Function to get query parameters from the URL
         function getQueryParams() {
@@ -116,105 +119,69 @@
             return div.innerHTML;
         }
 
-        /*
-        // Function to make Product Cloud API request
-        async function makeProductCloudRequest() {
-            const serverId = 'ausbpdi48dDNhmB3T0x7';
-            const clientId = '0oabpdi4tiT8wvJco0x7';
-            const clientSecret = '_DaNIKT5rNc4iIdXH0MNxBPGx3WGJJCzIxAAkjMLwJd4OU16XCDRExMRx8v_KN8N';
-            const redirectUri = 'https://jbhatiainsulet.github.io/auth';
+        
+
+        // SALESFORCE_CONFIG is now loaded from config.js (gitignored file)
+        
+        // Safety check: Verify config.js was loaded
+        if (typeof SALESFORCE_CONFIG === 'undefined') {
+            console.error('ERROR: config.js not found or SALESFORCE_CONFIG not defined!');
+            console.error('Please create config.js based on config.example.js');
+            alert('Configuration error: config.js is missing. Please create it from config.example.js');
+        }
+
+        // Function to get Salesforce OAuth access token
+        // Returns both access_token and instance_url from the response
+        async function getSalesforceAccessToken() {
+            // For sandbox, use test.salesforce.com; for production, use login.salesforce.com
+            const tokenEndpoint = 'https://test.salesforce.com/services/oauth2/token';
             
-            const params = getQueryParams();
-            const authCode = params.code;
-
-            // Validate authorization code
-            if (!authCode) {
-                alert('No authorization code found in URL');
-                return;
-            }
-
-            // Show loading state
-            const btn = document.getElementById('makeRequestBtn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
-
-            // Product Cloud API endpoint - OAuth 2.0 Auth Code to Token Exchange
-            const apiUrl = `https://eu-horizoncloud-int.omnipodapps.com/api/v1/authorization-bridge/${serverId}/token`;
+            const params = new URLSearchParams();
+            params.append('grant_type', 'password');
+            params.append('client_id', SALESFORCE_CONFIG.consumerKey);
+            params.append('client_secret', SALESFORCE_CONFIG.consumerSecret); 
+            params.append('username', SALESFORCE_CONFIG.username);
+            params.append('password', SALESFORCE_CONFIG.password);
 
             try {
-                
-                const requestBody = {
-                    redirectUri: redirectUri,
-                    clientId: clientId,
-                    code: authCode,
-                    clientSecret: clientSecret
-                };
-
-                console.log('Request Body:', requestBody);
-                console.log('API URL:', apiUrl);
-                
-                const response = await fetch(apiUrl, {
+                const response = await fetch(tokenEndpoint, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: JSON.stringify(requestBody)
+                    body: params
                 });
-
+                
                 const data = await response.json();
-
-                // Display response
-                const responseCard = document.getElementById('responseCard');
-                const responseAlert = document.getElementById('responseAlert');
-                const responseData = document.getElementById('responseData');
-
-                responseCard.style.display = 'block';
-
-                if (response.ok) {
-                    responseAlert.className = 'alert alert-success';
-                    responseAlert.textContent = `✅ Success! Status: ${response.status}`;
-                } else {
-                    responseAlert.className = 'alert alert-danger';
-                    responseAlert.textContent = `❌ Error! Status: ${response.status}`;
+                
+                if (!response.ok) {
+                    throw new Error(data.error_description || data.error || 'Failed to get access token');
                 }
-
-                responseData.textContent = JSON.stringify(data, null, 2);
-
+                
+                const instanceUrl = data.instance_url || '';
+                const instance = instanceUrl.replace('https://', '').replace('http://', '');
+                
+                return {
+                    access_token: data.access_token,
+                    instance: instance,
+                    instance_url: instanceUrl
+                };
             } catch (error) {
-                // Display error
-                const responseCard = document.getElementById('responseCard');
-                const responseAlert = document.getElementById('responseAlert');
-                const responseData = document.getElementById('responseData');
-
-                responseCard.style.display = 'block';
-                responseAlert.className = 'alert alert-danger';
-                responseAlert.textContent = '❌ Error making request';
-            } finally {
-                // Reset button state
-                btn.disabled = false;
-                btn.innerHTML = originalText;
+                console.error('Error getting access token:', error);
+                throw error;
             }
         }
 
-        */
-
-        const SALESFORCE_CONFIG = {
-            instance: 'insuleteu--jasmeetdev.sandbox.my.salesforce.com',
-            consumerKey: '3MVG96MLzwkgoRzkmTZLC9DdF8wOn5wVS3S5Ni4UiaFg3N.hPtdK85lTCIWF8fMHC4Wh2UtIU3wvNAAuaT3Qu',
-            username: 'edspDemoUser@insulet.com.gcx.jasmeetdev',
-            password: 'Test@EdspAccount1XZZg5QCQdXxEhoM0QWhStk6MB'
-        };
-
         // Function to call Salesforce token exchange endpoint
-        async function callTokenExchange(authCode) {
-            const endpoint = `https://${SALESFORCE_CONFIG.instance}/services/apexrest/cloudTokenExchange`;
+        async function callTokenExchange(authCode, accessToken, instance) {
+            const endpoint = `https://${instance}/services/apexrest/cloudTokenExchange`;
             
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
                     },
                     body: JSON.stringify({
                         authCode: authCode,
@@ -255,7 +222,11 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
 
             try {
-                const result = await callTokenExchange(authCode);
+                // get Salesforce access token
+                const tokenData = await getSalesforceAccessToken();
+                
+                // Call the endpoint with the token and instance
+                const result = await callTokenExchange(authCode, tokenData.access_token, tokenData.instance);
 
                 // Display response
                 const responseCard = document.getElementById('responseCard');
