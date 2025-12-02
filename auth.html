@@ -130,64 +130,22 @@
             alert('Configuration error: config.js is missing. Please create it from config.example.js');
         }
 
-        // Function to get Salesforce OAuth access token
-        // Returns both access_token and instance_url from the response
-        async function getSalesforceAccessToken() {
-            // For sandbox, use test.salesforce.com; for production, use login.salesforce.com
-            const tokenEndpoint = 'https://test.salesforce.com/services/oauth2/token';
-            
-            const params = new URLSearchParams();
-            params.append('grant_type', 'password');
-            params.append('client_id', SALESFORCE_CONFIG.consumerKey);
-            params.append('client_secret', SALESFORCE_CONFIG.consumerSecret); 
-            params.append('username', SALESFORCE_CONFIG.username);
-            params.append('password', SALESFORCE_CONFIG.password);
-
-            try {
-                const response = await fetch(tokenEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: params
-                });
-                
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.error_description || data.error || 'Failed to get access token');
-                }
-                
-                const instanceUrl = data.instance_url || '';
-                const instance = instanceUrl.replace('https://', '').replace('http://', '');
-                
-                return {
-                    access_token: data.access_token,
-                    instance: instance,
-                    instance_url: instanceUrl
-                };
-            } catch (error) {
-                console.error('Error getting access token:', error);
-                throw error;
-            }
-        }
-
-        // Function to call Salesforce token exchange endpoint
-        async function callTokenExchange(authCode, accessToken, instance) {
-            const endpoint = `https://${instance}/services/apexrest/cloudTokenExchange`;
+        // Function to call Salesforce token exchange endpoint (public, no token needed)
+        async function callTokenExchange(authCode) {
+            // Hardcoded public Salesforce endpoint URL
+            const endpoint = 'https://insuleteu--jasmeetdev.sandbox.my.salesforce-sites.com/CloudTokenExchange';
             
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
+                        // No Authorization header needed - endpoint is public
                     },
                     body: JSON.stringify({
-                        authCode: authCode,
-                        consumerKey: SALESFORCE_CONFIG.consumerKey,
-                        username: SALESFORCE_CONFIG.username,
-                        password: SALESFORCE_CONFIG.password
+                        authCode: authCode
+                        // Credentials are handled server-side in Salesforce
+                        // No need to send consumerKey, username, password
                     })
                 });
                 
@@ -222,11 +180,9 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
 
             try {
-                // get Salesforce access token
-                const tokenData = await getSalesforceAccessToken();
-                
-                // Call the endpoint with the token and instance
-                const result = await callTokenExchange(authCode, tokenData.access_token, tokenData.instance);
+                // Call the public endpoint directly (no token needed)
+                // The endpoint handles getting the Salesforce token internally
+                const result = await callTokenExchange(authCode);
 
                 // Display response
                 const responseCard = document.getElementById('responseCard');
