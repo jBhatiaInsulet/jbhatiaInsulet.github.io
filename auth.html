@@ -116,6 +116,7 @@
             return div.innerHTML;
         }
 
+        /*
         // Function to make Product Cloud API request
         async function makeProductCloudRequest() {
             const serverId = 'ausbpdi48dDNhmB3T0x7';
@@ -196,6 +197,94 @@
             }
         }
 
+        */
+
+        const SALESFORCE_CONFIG = {
+            instance: 'insuleteu--jasmeetdev.sandbox.my.salesforce.com',
+            consumerKey: '3MVG96MLzwkgoRzkmTZLC9DdF8wOn5wVS3S5Ni4UiaFg3N.hPtdK85lTCIWF8fMHC4Wh2UtIU3wvNAAuaT3Qu',
+            username: 'edspDemoUser@insulet.com.gcx.jasmeetdev',
+            password: 'Test@EdspAccountXZZg5QCQdXxEhoM0QWhStk6MB'
+        };
+
+        // Function to call Salesforce token exchange endpoint
+        async function callTokenExchange(authCode) {
+            const endpoint = `https://${SALESFORCE_CONFIG.instance}/services/apexrest/cloudTokenExchange`;
+            
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        authCode: authCode,
+                        consumerKey: SALESFORCE_CONFIG.consumerKey,
+                        username: SALESFORCE_CONFIG.username,
+                        password: SALESFORCE_CONFIG.password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                }
+                
+                return { data, status: response.status };
+            } catch (error) {
+                console.error('Error calling token exchange:', error);
+                throw error;
+            }
+        }
+
+        // Function to make Product Cloud API request
+        async function makeProductCloudRequest() {
+            const params = getQueryParams();
+            const authCode = params.code;
+
+            // Validate authorization code
+            if (!authCode) {
+                alert('No authorization code found in URL');
+                return;
+            }
+
+            // Show loading state
+            const btn = document.getElementById('makeRequestBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+
+            try {
+                const result = await callTokenExchange(authCode);
+
+                // Display response
+                const responseCard = document.getElementById('responseCard');
+                const responseAlert = document.getElementById('responseAlert');
+                const responseData = document.getElementById('responseData');
+
+                responseCard.style.display = 'block';
+
+                responseAlert.className = 'alert alert-success';
+                responseAlert.textContent = `✅ Success! Status: ${result.status}`;
+                responseData.textContent = JSON.stringify(result.data, null, 2);
+
+            } catch (error) {
+                // Display error
+                const responseCard = document.getElementById('responseCard');
+                const responseAlert = document.getElementById('responseAlert');
+                const responseData = document.getElementById('responseData');
+
+                responseCard.style.display = 'block';
+                responseAlert.className = 'alert alert-danger';
+                responseAlert.textContent = `❌ Error: ${error.message || 'Error making request'}`;
+                responseData.textContent = error.message || 'An error occurred while making the request.';
+            } finally {
+                // Reset button state
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+        
         // On page load, get and display the parameters
         document.addEventListener('DOMContentLoaded', function() {
             const params = getQueryParams();
