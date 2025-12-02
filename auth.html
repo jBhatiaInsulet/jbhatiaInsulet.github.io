@@ -133,8 +133,7 @@
         // Function to call Salesforce token exchange endpoint (public, no token needed)
         async function callTokenExchange(authCode) {
             // Hardcoded public Salesforce endpoint URL
-            // Note: Salesforce Sites REST endpoints need /services/apexrest/ path
-            const endpoint = 'https://insuleteu--jasmeetdev.sandbox.my.salesforce-sites.com/services/apexrest/CloudTokenExchange';
+            const endpoint = 'https://insuleteu--jasmeetdev.sandbox.my.salesforce-sites.com/services/apexrest/cloudTokenExchange';
             
             try {
                 const response = await fetch(endpoint, {
