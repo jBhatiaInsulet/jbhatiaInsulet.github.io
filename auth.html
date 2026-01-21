@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Authentication Response</title>
-    <!-- Bootstrap 5 CSS -->
+    <!-- Import Bootstrap styles -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <!-- Import custom styles -->
     <link href="styles.css" rel="stylesheet">
 </head>
 <body>
@@ -27,7 +27,7 @@
                             Query Parameters
                         </h5>
                         
-                        <!-- State Parameter -->
+                        <!-- State parameter from the OAuth callback -->
                         <div class="mb-3 param-group">
                             <label class="form-label">
                                 <span class="icon">🏷️</span>
@@ -38,7 +38,7 @@
                             </div>
                         </div>
 
-                        <!-- Auth Code Parameter -->
+                        <!-- Authorization code from the OAuth callback -->
                         <div class="mb-3 param-group">
                             <label class="form-label">
                                 <span class="icon">🔑</span>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
 
-                <!-- API Request Card -->
+                <!-- Card for making the API request -->
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title mb-3">
@@ -60,7 +60,7 @@
                             Product Cloud API Request
                         </h5>
                         
-                        <!-- Make Request Button -->
+                        <!-- Button to trigger the API call -->
                         <div class="d-grid">
                             <button class="btn btn-primary btn-lg" id="makeRequestBtn" onclick="makeProductCloudRequest()">
                                 <span class="icon">📡</span>
@@ -70,7 +70,7 @@
                     </div>
                 </div>
 
-                <!-- API Response Card -->
+                <!-- Card to show the API response -->
                 <div class="card mb-4" id="responseCard" style="display: none;">
                     <div class="card-body">
                         <h5 class="card-title mb-3">
@@ -86,14 +86,11 @@
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS Bundle -->
+    <!-- Import Bootstrap JS library -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Configuration file with secrets (gitignored) -->
-    <script src="config.js"></script>
-    
     <script>
-        // Function to get query parameters from the URL
+        // Extract the state and code from the URL query parameters
         function getQueryParams() {
             const params = new URLSearchParams(window.location.search);
             return {
@@ -102,7 +99,7 @@
             };
         }
 
-        // Function to display parameter value
+        // Show the parameter value in the UI, or a placeholder if it's missing
         function displayParam(elementId, value) {
             const element = document.getElementById(elementId);
             if (value) {
@@ -112,27 +109,16 @@
             }
         }
 
-        // Function to escape HTML to prevent XSS
+        // Sanitize text to prevent XSS attacks
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        
-
-        // SALESFORCE_CONFIG is now loaded from config.js (gitignored file)
-        
-        // Safety check: Verify config.js was loaded
-        if (typeof SALESFORCE_CONFIG === 'undefined') {
-            console.error('ERROR: config.js not found or SALESFORCE_CONFIG not defined!');
-            console.error('Please create config.js based on config.example.js');
-            alert('Configuration error: config.js is missing. Please create it from config.example.js');
-        }
-
-        // Function to call Salesforce token exchange endpoint (public, no token needed)
+        // Exchange the authorization code for a Salesforce token
+        // This endpoint is public, so we don't need to send any auth headers
         async function callTokenExchange(authCode) {
-            // Hardcoded public Salesforce endpoint URL
             const endpoint = 'https://insuleteu--jasmeetdev.sandbox.my.salesforce-sites.com/services/apexrest/cloudTokenExchange';
             
             try {
@@ -140,7 +126,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        // No Authorization header needed - endpoint is public
+                        // This is a public endpoint, so no auth header needed
                     },
                     body: JSON.stringify({
                         authCode: authCode
@@ -162,26 +148,25 @@
             }
         }
 
-        // Function to make Product Cloud API request
+        // Make the API request to Product Cloud using the authorization code
         async function makeProductCloudRequest() {
             const params = getQueryParams();
             const authCode = params.code;
 
-            // Validate authorization code
+            // Make sure we actually have an auth code to work with
             if (!authCode) {
                 alert('No authorization code found in URL');
                 return;
             }
 
-            // Show loading state
+            // Update the button to show we're working on it
             const btn = document.getElementById('makeRequestBtn');
             const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
 
             try {
-                // Call the public endpoint directly (no token needed)
-                // The endpoint handles getting the Salesforce token internally
+                // Call the token exchange endpoint - it handles everything internally
                 const result = await callTokenExchange(authCode);
 
                 // Display response
@@ -200,19 +185,21 @@
                 const responseCard = document.getElementById('responseCard');
                 const responseAlert = document.getElementById('responseAlert');
                 const responseData = document.getElementById('responseData');
+                
+
 
                 responseCard.style.display = 'block';
                 responseAlert.className = 'alert alert-danger';
                 responseAlert.textContent = `❌ Error: ${error.message || 'Error making request'}`;
                 responseData.textContent = error.message || 'An error occurred while making the request.';
             } finally {
-                // Reset button state
+                // Put the button back to normal
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
         }
         
-        // On page load, get and display the parameters
+        // When the page loads, grab the query params and display them
         document.addEventListener('DOMContentLoaded', function() {
             const params = getQueryParams();
             
