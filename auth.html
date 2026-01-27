@@ -119,18 +119,19 @@
         // Exchange the authorization code for a Salesforce token
         async function callTokenExchange(authCode, codeVerifier, clientId) {
             const endpoint = 'https://insuleteu--jasmeetdev.sandbox.my.salesforce-sites.com/services/apexrest/cloudTokenExchange';
-            
+            const requestBody = {
+                authCode: authCode,
+                codeVerifier: codeVerifier,
+                clientId: clientId
+            }
+            console.log('Request body:', JSON.stringify(requestBody));
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        authCode: authCode,
-                        codeVerifier: codeVerifier,
-                        clientId: clientId
-                    })
+                    body: JSON.stringify(requestBody)
                 });
                 
                 const data = await response.json();
