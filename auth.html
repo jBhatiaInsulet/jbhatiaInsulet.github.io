@@ -95,7 +95,7 @@
             const params = new URLSearchParams(window.location.search);
             return {
                 state: params.get('state'),
-                code: params.get('code')
+                code: params.get('code'),
             };
         }
 
@@ -117,8 +117,7 @@
         }
 
         // Exchange the authorization code for a Salesforce token
-        // This endpoint is public, so we don't need to send any auth headers
-        async function callTokenExchange(authCode) {
+        async function callTokenExchange(authCode, codeVerifier, clientId) {
             const endpoint = 'https://insuleteu--jasmeetdev.sandbox.my.salesforce-sites.com/services/apexrest/cloudTokenExchange';
             
             try {
@@ -126,12 +125,11 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        // This is a public endpoint, so no auth header needed
                     },
                     body: JSON.stringify({
-                        authCode: authCode
-                        // Credentials are handled server-side in Salesforce
-                        // No need to send consumerKey, username, password
+                        authCode: authCode,
+                        codeVerifier: codeVerifier,
+                        clientId: clientId
                     })
                 });
                 
@@ -151,6 +149,10 @@
         // Make the API request to Product Cloud using the authorization code
         async function makeProductCloudRequest() {
             const params = getQueryParams();
+            // get code verifier from session storage
+            const codeVerifier = sessionStorage.getItem('pkceCodeVerifier');
+            // get client id from session storage
+            const clientId = sessionStorage.getItem('clientId');
             const authCode = params.code;
 
             // Make sure we actually have an auth code to work with
@@ -167,7 +169,7 @@
 
             try {
                 // Call the token exchange endpoint - it handles everything internally
-                const result = await callTokenExchange(authCode);
+                const result = await callTokenExchange(authCode, codeVerifier, clientId);
 
                 // Display response
                 const responseCard = document.getElementById('responseCard');

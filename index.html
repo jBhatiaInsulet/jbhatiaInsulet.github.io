@@ -146,10 +146,12 @@
             const data = encoder.encode(codeVerifier);
             const hash = await crypto.subtle.digest("SHA-256", data);
             const codeChallenge = base64UrlEncode(hash);
-            // Remove the old code verifier from Session Storage
+            // Remove the old code verifier and client id from Session Storage
             sessionStorage.removeItem('pkceCodeVerifier');
+            sessionStorage.removeItem('clientId');
             // Save the Code verifier in Session Storage
             sessionStorage.setItem('pkceCodeVerifier', codeVerifier);
+            sessionStorage.setItem('clientId', clientIdSelect.value);
             return { codeVerifier, codeChallenge };
         }
 
