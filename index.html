@@ -45,8 +45,8 @@
                         </label>
                         <select class="form-select" id="clientId" aria-label="Partner Name">
                             <option value="" selected>-- Select Partner --</option>
-                            <option value="0oabpdi4tiT8wvJco0x7">Stenopool</option>
-                            <option value="0oad7jq9qeVOQsgFs0x7">Test Stenopool</option>
+                            <option id="stenopool-option" value="0oabpdi4tiT8wvJco0x7">Stenopool</option>
+                            <option id="test-stenopool-option" value="0oad7jq9qeVOQsgFs0x7">Test Stenopool</option>
                         </select>
                     </div>
 
@@ -76,11 +76,43 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // Client IDs mapping
+        const clientIds = {
+            stenopool: {
+                dev: '0oabpdi4tiT8wvJco0x7',
+                qa: '0oabpdi4tiT8wvJco0x7',
+                preprod: '0oabpdxojtQT6BShO0x7'
+            },
+            testStenopool: {
+                dev: '0oad7jq9qeVOQsgFs0x7',
+                qa: '0oad7jq9qeVOQsgFs0x7',
+                preprod: '0oad7ku9teaNshEas0x7'
+            }
+        };
+
+        // Okta base URLs mapping
+        const oktaBaseUrls = {
+            dev: 'https://oktadev-eu.omnipod.com',
+            qa: 'https://oktadev-eu.omnipod.com',
+            preprod: 'https://oktastage-eu.omnipod.com'
+        };
+
         // Get DOM elements
         const clientIdSelect = document.getElementById('clientId');
         const environmentSelect = document.getElementById('environment');
         const generatedUrlTextarea = document.getElementById('generatedUrl');
         const navigateBtn = document.getElementById('navigateBtn');
+
+        // Function to update client IDs based on selected environment
+        function updateClientIds() {
+            const env = environmentSelect.value;
+            if (env) {
+                const stenopoolOption = document.getElementById('stenopool-option');
+                const testStenopoolOption = document.getElementById('test-stenopool-option');
+                stenopoolOption.value = clientIds.stenopool[env];
+                testStenopoolOption.value = clientIds.testStenopool[env];
+            }
+        }
 
         // Function to convert environment name to URL format
         function getEnvironmentSlug(environment) {
@@ -101,8 +133,9 @@
 
                 const relayStateValue = encodeURIComponent(`/s/edsp?client_id=${clientId}&code_challenge=${codeChallenge}&state=${state}`);
 
-                // Build the return URL with encoded RelayState
-                const returnUrl = `https://oktadev-eu.omnipod.com/app/salesforce/exk1pblh38RCagT5M0x7/sso/saml?RelayState=${relayStateValue}`;
+                // Build the return URL with encoded RelayState using the correct Okta base URL
+                const oktaBaseUrl = oktaBaseUrls[environment];
+                const returnUrl = `${oktaBaseUrl}/app/salesforce/exk1pblh38RCagT5M0x7/sso/saml?RelayState=${relayStateValue}`;
 
                 // Build the full URL with proper encoding
                 const fullUrl = `https://account-intl${envSlug}.omnipod.com/?app=self&returnURL=${encodeURIComponent(returnUrl)}`;
