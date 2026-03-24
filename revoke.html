@@ -204,7 +204,7 @@
                     throw new Error(typeof errMsg === 'string' ? errMsg : JSON.stringify(errMsg));
                 }
 
-                const pretty = data != null ? JSON.stringify(data, null, 2) : (text || '(empty body)');
+                const pretty = data != null ? JSON.stringify(data, null, 2) : (text || '');
                 showResponse(true, `Success (${response.status})`, pretty);
             } catch (err) {
                 console.error('Revoke request failed:', err);
