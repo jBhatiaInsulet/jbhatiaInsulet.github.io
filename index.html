@@ -122,6 +122,7 @@
 
         // Function to update URL and button state
         async function updateUrl() {
+            updateClientIds();
             const clientId = clientIdSelect.value;
             const environment = environmentSelect.value;
             const { codeVerifier, codeChallenge } = await generateCodeChallenge();
