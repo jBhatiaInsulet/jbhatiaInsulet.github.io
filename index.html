@@ -135,7 +135,8 @@
 
                 // Build the return URL with encoded RelayState using the correct Okta base URL
                 const oktaBaseUrl = oktaBaseUrls[environment];
-                const returnUrl = `${oktaBaseUrl}/app/salesforce/exk1pblh38RCagT5M0x7/sso/saml?RelayState=${relayStateValue}`;
+                const oktaAuthServer = envSlug === 'preprod' ? 'exk2y385hxVkHwZW00x7': 'exk1pblh38RCagT5M0x7';
+                const returnUrl = `${oktaBaseUrl}/app/salesforce/${oktaAuthServer}/sso/saml?RelayState=${relayStateValue}`;
 
                 // Build the full URL with proper encoding
                 const fullUrl = `https://account-intl${envSlug}.omnipod.com/?app=self&returnURL=${encodeURIComponent(returnUrl)}`;
