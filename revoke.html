@@ -42,7 +42,7 @@
                         <select class="form-select" id="clientId" aria-label="Partner" required>
                             <option value="" selected>-- Select Partner --</option>
                             <option id="stenopool-option" value="0oabpdi4tiT8wvJco0x7">Stenopool</option>
-                            <option id="test-stenopool-option" value="0oad7jq9qeVOQsgFs0x7">Test Stenopool</option>
+                            <option id="test-edsp-option" value="0oad7jq9qeVOQsgFs0x7">Test EDSP</option>
                         </select>
                     </div>
 
@@ -112,9 +112,9 @@
             const env = environmentSelect.value;
             if (!env) return;
             const stenopoolOption = document.getElementById('stenopool-option');
-            const testStenopoolOption = document.getElementById('test-stenopool-option');
+            const testEdspOption = document.getElementById('test-edsp-option');
             stenopoolOption.value = clientIds.stenopool[env];
-            testStenopoolOption.value = clientIds.testStenopool[env];
+            testEdspOption.value = clientIds.testStenopool[env];
         }
 
         /** Allow only A–Z, a–z, 0–9; cap length to block injection via pasted content. */
