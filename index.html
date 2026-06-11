@@ -138,7 +138,7 @@
                 // Construct the URL dynamically
                 const envSlug = getEnvironmentSlug(environment);
 
-                const relayStateValue = encodeURIComponent(`/s/edsp?client_id=${clientId}&code_challenge=${codeChallenge}&state=${state}`);
+                const relayStateValue = encodeURIComponent(`/s/edsp?client_id=${clientId}&code_challenge=${codeChallenge}&state=${state}&prompt=login`);
 
                 // Build the return URL with encoded RelayState using the correct Okta base URL
                 const oktaBaseUrl = oktaBaseUrls[environment];
