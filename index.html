@@ -126,6 +126,18 @@
             return environment.toLowerCase().replace(/\s+/g, '');
         }
 
+        function getOktaEnvironment(environment) {
+            // If the environment is Dev or QA then the environment is dev
+            // And when the environment is Pre Prod then the environment is stage
+            if(environment.toLowerCase() === 'preprod'){
+                return 'stage';
+            } else if (environment.toLowerCase() === 'dev' || environment.toLowerCase() === 'qa') {
+                return 'dev';
+            } else {
+                return '';
+            }
+        }
+
         // Function to update URL and button state
         async function updateUrl() {
             updateClientIds();
@@ -137,6 +149,7 @@
             if (clientId && environment) {
                 // Construct the URL dynamically
                 const envSlug = getEnvironmentSlug(environment);
+                const oktaEnvSlug = getOktaEnvironment(environment);
 
                 const relayStateValue = encodeURIComponent(`/s/edsp?client_id=${clientId}&code_challenge=${codeChallenge}&state=${state}`);
 
@@ -146,7 +159,19 @@
                 const returnUrl = `${oktaBaseUrl}/app/salesforce/${oktaAuthServer}/sso/saml?prompt=login&RelayState=${relayStateValue}`;
 
                 // Build the full URL with proper encoding
-                const fullUrl = `https://account-intl${envSlug}.omnipod.com/?app=self&returnURL=${encodeURIComponent(returnUrl)}`;
+                const originalUrl = `https://account-intl${envSlug}.omnipod.com/?app=self&returnURL=${encodeURIComponent(returnUrl)}`;
+
+                // encode the original URL
+                const encodedOriginalUrl = encodeURIComponent(originalUrl);
+
+                // Put the encoded original URL in the login URL
+                const loginUrl = `https://${oktaEnvSlug}.insuletid.com/login?app=self&returnURL=${encodedOriginalUrl}`;
+                
+                // encode the login URL
+                const encodedLoginUrl = encodeURIComponent(loginUrl);
+
+                const fullUrl = `https://${oktaEnvSlug}.insuletid.com/logout?LogoutRedirectUrl=${encodedLoginUrl}`;
+
 
                 // Update textarea
                 generatedUrlTextarea.value = fullUrl;
