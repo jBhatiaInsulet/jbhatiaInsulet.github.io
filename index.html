@@ -165,12 +165,12 @@
                 const encodedOriginalUrl = encodeURIComponent(originalUrl);
 
                 // Put the encoded original URL in the login URL
-                const loginUrl = `https://${oktaEnvSlug}.insuletid.com/login?app=self&returnURL=${encodedOriginalUrl}`;
+                //const loginUrl = `https://${oktaEnvSlug}.insuletid.com/login?app=self&returnURL=${encodedOriginalUrl}`;
                 
                 // encode the login URL
-                const encodedLoginUrl = encodeURIComponent(loginUrl);
+                //const encodedLoginUrl = encodeURIComponent(loginUrl);
 
-                const fullUrl = `https://${oktaEnvSlug}.insuletid.com/logout?LogoutRedirectUrl=${encodedLoginUrl}`;
+                const fullUrl = `https://account-intl${envSlug}.omnipod.com/logout?LogoutRedirectUrl=${encodedOriginalUrl}`;
 
 
                 // Update textarea
